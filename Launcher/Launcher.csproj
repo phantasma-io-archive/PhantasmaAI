@@ -5,19 +5,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <StartupObject>ChatGPT.Program</StartupObject>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Betalgo.OpenAI" Version="6.8.5" />
     <PackageReference Include="LunarLabs.Parser" Version="1.5.4" />
+    <PackageReference Include="LunarLabs.Server" Version="1.5.10" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LunarServer\LunarServer\LunarServer.csproj" />
+    <ProjectReference Include="..\ChatBotLib\ChatBotLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="apikey.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="assistant.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

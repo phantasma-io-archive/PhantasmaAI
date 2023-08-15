@@ -8,3 +8,5 @@ bin/
 obj/
 
 www/Chatlogs/
+
+www/apikey.txt

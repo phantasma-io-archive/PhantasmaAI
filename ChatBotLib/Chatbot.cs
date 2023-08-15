@@ -1,15 +1,17 @@
-﻿using System.Text;
-
-using LunarLabs.WebServer.Core;
-using LunarLabs.WebServer.HTTP;
-using LunarLabs.WebServer.Templates;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using OpenAI.GPT3;
 using OpenAI.GPT3.Managers;
 using OpenAI.GPT3.ObjectModels.RequestModels;
 using OpenAI.GPT3.ObjectModels;
+using LunarLabs.WebServer.HTTP;
+using LunarLabs.WebServer.Templates;
 
-namespace ChatGPT
+namespace Phantasma.AI
 {
     public struct ChatEntry
     {
@@ -28,35 +30,38 @@ namespace ChatGPT
         }
     }
 
-    internal class Program
-    {
-        // Declare the API key
-        private static string apiKey = null;
+    public class Chatbot
+    {        // Declare the API key
+        private string apiKey = null;
 
-        private static string chatLogPath;
+        private string chatLogPath;
 
-        private static ServerSettings settings;
+        private OpenAIService gpt3;
+        private string assistantText;
 
-        private static OpenAIService gpt3;
-        private static string assistantText;
+        private Dictionary<string, List<ChatEntry>> convos = new Dictionary<string, List<ChatEntry>>();
+        private HashSet<string> pending = new HashSet<string>();
 
-        private static Dictionary<string, List<ChatEntry>> convos = new Dictionary<string, List<ChatEntry>>();
-        private static HashSet<string> pending = new HashSet<string>();
-
-        static async void InitChatGPT(string path)
+        public Chatbot(string path, string apiKey)
         {
+            if (!path.EndsWith('/'))
+            {
+                path += "/";
+            }
+
+            chatLogPath = path + "Chatlogs/";
+            if (!Directory.Exists(chatLogPath))
+            {
+                Directory.CreateDirectory(chatLogPath);
+            }
+
             if (string.IsNullOrEmpty(apiKey))
             {
-                var apiKeyFile = "apikey.txt";
-                if (File.Exists(apiKeyFile))
-                {
-                    apiKey = File.ReadAllText(apiKeyFile).Trim();
-                }
-
-                if (string.IsNullOrEmpty(apiKey))
-                {
-                    throw new Exception("Please configure API key");
-                }
+                throw new Exception("Please configure API key");
+            }
+            else
+            {
+                this.apiKey = apiKey;
             }
 
             // Create an instance of the OpenAIService class
@@ -73,9 +78,45 @@ namespace ChatGPT
             }
         }
 
+        public void Install(HTTPServer server)
+        {
+            var templateEngine = new TemplateEngine(server, "botviews");
+
+            server.Get("/", (request) =>
+            {
+                var context = GetContext(request);
+                return templateEngine.Render(context, "main");
+            });
+
+            server.Get("/chat/{ID}", (request) =>
+            {
+                var context = GetContext(request);
+                return templateEngine.Render(context, "convo");
+            });
+
+            server.Post("/chat/{ID}", (request) =>
+            {
+                var text = request.GetVariable("message");
+
+                var userID = request.GetVariable("ID");
+
+                List<ChatEntry> convo = FindConvo(userID);
+                lock (convos)
+                {
+                    convo.Add(new ChatEntry(false, text));
+                }
+
+                //var result = Task.Run(() => DoChatRequest(userID, text)).Result; 
+                DoChatRequest(userID, text);
+
+                var context = GetContext(request);
+                return templateEngine.Render(context, "convo");
+            });
+        }
+
         const string CHAT_BREAK = "####";
 
-        static string FilterCodeTags(string input, ref bool insideCode)
+        private string FilterCodeTags(string input, ref bool insideCode)
         {
             var sb = new StringBuilder();
 
@@ -102,8 +143,8 @@ namespace ChatGPT
                     }
                 }
                 else
-                switch (ch)
-                {
+                    switch (ch)
+                    {
                         case '<': sb.Append("&lt;"); break;
                         case '>': sb.Append("&gt;"); break;
                         case '&': sb.Append("&amp;"); break;
@@ -112,7 +153,7 @@ namespace ChatGPT
 
                         default:
                             sb.Append(ch); break;
-                }
+                    }
 
                 prev1 = prev2;
                 prev2 = ch;
@@ -121,7 +162,7 @@ namespace ChatGPT
             return sb.ToString();
         }
 
-        static List<ChatEntry> BeautifyConvo(List<ChatEntry> convo)
+        private List<ChatEntry> BeautifyConvo(List<ChatEntry> convo)
         {
             var result = new List<ChatEntry>();
 
@@ -157,7 +198,7 @@ namespace ChatGPT
             return result;
         }
 
-        static List<ChatEntry> FindConvo(string userID)
+        private List<ChatEntry> FindConvo(string userID)
         {
             List<ChatEntry> convo;
 
@@ -222,7 +263,7 @@ namespace ChatGPT
             return convo;
         }
 
-        static async Task<bool> DoChatRequest(string userID, string questionText)
+        private async Task<bool> DoChatRequest(string userID, string questionText)
         {
             lock (pending)
             {
@@ -242,7 +283,7 @@ namespace ChatGPT
 
             foreach (var entry in convo)
             {
-                string role = entry.isSpecky? "assistant" :"user";
+                string role = entry.isSpecky ? "assistant" : "user";
 
                 messages.Add(new ChatMessage(role, entry.text));
             }
@@ -305,7 +346,7 @@ namespace ChatGPT
             return completionResult.Successful;
         }
 
-        private static void LimitTokens(IList<ChatMessage> messages, int tokenLimit)
+        private void LimitTokens(IList<ChatMessage> messages, int tokenLimit)
         {
             int discardedCount = 0;
 
@@ -324,7 +365,7 @@ namespace ChatGPT
                     break;
                 }
 
-                for (int i=0; i<messages.Count; i++)
+                for (int i = 0; i < messages.Count; i++)
                 {
                     if (messages[i].Role != "system")
                     {
@@ -342,7 +383,7 @@ namespace ChatGPT
             }
         }
 
-        static string GetConvoAsJSON(string userID)
+        private string GetConvoAsJSON(string userID)
         {
             var json = new StringBuilder();
             json.Append('[');
@@ -357,21 +398,21 @@ namespace ChatGPT
             return json.ToString();
         }
 
-        static string GetChatLogPath(string userID)
+        private string GetChatLogPath(string userID)
         {
             return chatLogPath + userID + ".txt";
         }
 
-        static bool ChatExists(string userID)
+        private bool ChatExists(string userID)
         {
-            var fileName = GetChatLogPath(userID); 
+            var fileName = GetChatLogPath(userID);
             return File.Exists(fileName);
         }
 
 
-        static Random random = new Random();
+        private static Random random = new Random();
 
-        static string GenerateUserID()
+        private string GenerateUserID()
         {
             lock (convos)
             {
@@ -391,7 +432,7 @@ namespace ChatGPT
             }
         }
 
-        static Dictionary<string, object> GetContext(HTTPRequest request)
+        private Dictionary<string, object> GetContext(HTTPRequest request)
         {
             var session = request.session;
 
@@ -412,69 +453,6 @@ namespace ChatGPT
             return context;
         }
 
-        static async Task Main(string[] args)
-        {
-            settings = ServerSettings.Parse(args, prefix: "-");
 
-            var path = settings.Path;
-            Console.WriteLine("Server path: " + path);
-
-            chatLogPath = path + "Chatlogs/";
-            if (!Directory.Exists(chatLogPath))
-            {
-                Directory.CreateDirectory(chatLogPath);
-            }
-
-            InitChatGPT(path);
-
-            var server = new HTTPServer(settings, ConsoleLogger.Write);
-
-            var templateEngine = new TemplateEngine(server, "views");
-
-            server.Get("/", (request) =>
-            {
-                var context = GetContext(request);
-                return templateEngine.Render(context, "main");
-            });
-
-            server.Get("/chat/{ID}", (request) =>
-            {
-                var context = GetContext(request);
-                return templateEngine.Render(context, "convo");
-            });
-
-            server.Post("/chat/{ID}", (request) =>
-            {
-                var text = request.GetVariable("message");
-
-                var userID = request.GetVariable("ID");
-
-                List<ChatEntry> convo = FindConvo(userID);
-                lock (convos)
-                {
-                    convo.Add(new ChatEntry(false, text));
-                }
-
-                //var result = Task.Run(() => DoChatRequest(userID, text)).Result; 
-                DoChatRequest(userID, text);
-
-                var context = GetContext(request);
-                return templateEngine.Render(context, "convo");
-            });
-
-            server.Run();
-
-            bool running = true;
-
-            Console.CancelKeyPress += delegate {
-                server.Stop();
-                running = false;
-            };
-
-            while (running)
-            {
-                Thread.Sleep(500);
-            }
-        }
     }
 }
