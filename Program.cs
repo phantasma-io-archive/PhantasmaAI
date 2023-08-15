@@ -47,9 +47,10 @@ namespace ChatGPT
         {
             if (string.IsNullOrEmpty(apiKey))
             {
-                if (File.Exists("api.txt"))
+                var apiKeyFile = "apikey.txt";
+                if (File.Exists(apiKeyFile))
                 {
-                    apiKey = File.ReadAllText("api.txt").Trim();
+                    apiKey = File.ReadAllText(apiKeyFile).Trim();
                 }
 
                 if (string.IsNullOrEmpty(apiKey))
