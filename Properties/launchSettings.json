@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ChatGPT": {
+      "commandName": "Project",
+      "commandLineArgs": "-path=C:\\code\\PhantasmaAI\\www"
+    }
+  }
+}
