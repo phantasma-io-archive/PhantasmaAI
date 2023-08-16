@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\LunarServer\LunarServer\LunarServer.csproj" />
     <ProjectReference Include="..\ChatBotLib\ChatBotLib.csproj" />
   </ItemGroup>
 

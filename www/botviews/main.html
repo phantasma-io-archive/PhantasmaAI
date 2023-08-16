@@ -6,11 +6,9 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Phantasma AI</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="css/styles.css" rel="stylesheet" />
-        <link href="css/custom.css" rel="stylesheet" />
+        <link href="css/chatbot.css" rel="stylesheet" />
 		
 		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
@@ -20,16 +18,22 @@
     </head>
     <body>
 <script>
-var endPoint = "chat/{{user_id}}";
+var endPoint = "/convo/{{chat_id}}";
 
 console.log("Session id: {{user_id}}");
+console.log("Chat id: {{chat_id}}");
 
 var dots = 0;
+var tryCount = 0;
 var hasAnswer = false;    
-var chatInterval = false;
+var chatInterval = -1;
 
-function startChatInterval() {
-    chatInterval = setInterval(getChat, 4000);
+function startChatInterval() 
+{
+	if (chatInterval === -1) 
+	{
+		chatInterval = setInterval(getChat, 4000);
+	}
 }
 
 function getChat() {
@@ -44,6 +48,10 @@ function getChat() {
 			$('#chatContent').html(response);
 			//hljs.highlightAll();
 		
+			tryCount++;
+			if (tryCount >= 6) {
+				location.reload();
+			}				
         },
         error: function(error) {
 			$('#error_message').removeClass('d-none');
@@ -55,6 +63,7 @@ function getChat() {
 }
 
 function sendChat() {
+	tryCount = 0;
 	console.log("Sending chat...");
 	$('#sendBtn').attr('disabled', 'disabled'); // Disable the Send button
 
@@ -78,8 +87,6 @@ function sendChat() {
 		success: function(response) {
 			console.log("Chat sent successfully");
 			$('#chatContent').html(response);
-			// Set a timeout to call getChat every 2 seconds
-			startChatInterval();
 		},
 		error: function(error) {
 			$('#error_message').removeClass('d-none');

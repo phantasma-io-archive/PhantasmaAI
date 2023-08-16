@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher", "Launcher\Launch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBotLib", "ChatBotLib\ChatBotLib.csproj", "{B128DFC4-4934-4E99-9832-DCA40717B260}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LunarServer", "..\LunarServer\LunarServer\LunarServer.csproj", "{09F5F305-6ADE-433A-98B9-F26583B34809}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B128DFC4-4934-4E99-9832-DCA40717B260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B128DFC4-4934-4E99-9832-DCA40717B260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B128DFC4-4934-4E99-9832-DCA40717B260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09F5F305-6ADE-433A-98B9-F26583B34809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09F5F305-6ADE-433A-98B9-F26583B34809}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09F5F305-6ADE-433A-98B9-F26583B34809}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09F5F305-6ADE-433A-98B9-F26583B34809}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

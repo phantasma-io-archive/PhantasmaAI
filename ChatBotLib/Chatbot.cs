@@ -31,16 +31,16 @@ namespace Phantasma.AI
     }
 
     public class Chatbot
-    {        // Declare the API key
-        private string apiKey = null;
+    {   
+        private string apiKey;
 
         private string chatLogPath;
 
         private OpenAIService gpt3;
         private string assistantText;
 
-        private Dictionary<string, List<ChatEntry>> convos = new Dictionary<string, List<ChatEntry>>();
-        private HashSet<string> pending = new HashSet<string>();
+        private Dictionary<int, List<ChatEntry>> convos = new Dictionary<int, List<ChatEntry>>();
+        private HashSet<int> pending = new HashSet<int>();
 
         public Chatbot(string path, string apiKey)
         {
@@ -78,36 +78,53 @@ namespace Phantasma.AI
             }
         }
 
-        public void Install(HTTPServer server)
+        public void Install(HTTPServer server, string entryPath = "/")
         {
             var templateEngine = new TemplateEngine(server, "botviews");
 
-            server.Get("/", (request) =>
+            if (!entryPath.EndsWith("/"))
+            {
+                entryPath += "/";
+            }
+
+            server.Get(entryPath, (request) =>
+            {
+                var id = request.session.GetInt("chat_id");
+
+                if (id == 0)
+                {
+                    id = GenerateUserID();
+                }
+
+                return HTTPResponse.Redirect(entryPath + id);
+            });
+
+            server.Get(entryPath + "{chat_id}", (request) =>
             {
                 var context = GetContext(request);
                 return templateEngine.Render(context, "main");
             });
 
-            server.Get("/chat/{ID}", (request) =>
+            server.Get("/convo/{chat_id}", (request) =>
             {
                 var context = GetContext(request);
                 return templateEngine.Render(context, "convo");
             });
 
-            server.Post("/chat/{ID}", (request) =>
+            server.Post("/convo/{chat_id}", (request) =>
             {
                 var text = request.GetVariable("message");
 
-                var userID = request.GetVariable("ID");
+                var chat_id = GetChatID(request);
 
-                List<ChatEntry> convo = FindConvo(userID);
+                List<ChatEntry> convo = FindConvo(chat_id);
                 lock (convos)
                 {
                     convo.Add(new ChatEntry(false, text));
                 }
 
                 //var result = Task.Run(() => DoChatRequest(userID, text)).Result; 
-                DoChatRequest(userID, text);
+                DoChatRequest(chat_id, text);
 
                 var context = GetContext(request);
                 return templateEngine.Render(context, "convo");
@@ -198,20 +215,20 @@ namespace Phantasma.AI
             return result;
         }
 
-        private List<ChatEntry> FindConvo(string userID)
+        private List<ChatEntry> FindConvo(int chat_id)
         {
             List<ChatEntry> convo;
 
             lock (convos)
             {
-                if (convos.ContainsKey(userID))
+                if (convos.ContainsKey(chat_id))
                 {
-                    convo = convos[userID];
+                    convo = convos[chat_id];
                 }
                 else
-                if (ChatExists(userID))
+                if (ChatExists(chat_id))
                 {
-                    var fileName = GetChatLogPath(userID);
+                    var fileName = GetChatLogPath(chat_id);
                     var lines = File.ReadAllLines(fileName);
 
                     convo = new List<ChatEntry>();
@@ -250,36 +267,38 @@ namespace Phantasma.AI
                         convo.Add(new ChatEntry(isSpecky, sb.ToString()));
                     }
 
-                    convos[userID] = convo;
+                    convos[chat_id] = convo;
                 }
                 else
                 {
                     convo = new List<ChatEntry>();
                     convo.Add(new ChatEntry(true, "Hello Souldier, what do you want to build today?"));
-                    convos[userID] = convo;
+                    convos[chat_id] = convo;
                 }
             }
 
             return convo;
         }
 
-        private async Task<bool> DoChatRequest(string userID, string questionText)
+        private async Task<bool> DoChatRequest(int chat_id, string questionText)
         {
+            Console.WriteLine($"CHATGPT.beginRequest({chat_id})");
+
             lock (pending)
             {
-                if (pending.Contains(userID))
+                if (pending.Contains(chat_id))
                 {
                     return false;
                 }
 
-                pending.Add(userID);
+                pending.Add(chat_id);
             }
 
             IList<ChatMessage> messages = new List<ChatMessage>();
 
             messages.Add(new ChatMessage("system", assistantText));
 
-            List<ChatEntry> convo = FindConvo(userID);
+            List<ChatEntry> convo = FindConvo(chat_id);
 
             foreach (var entry in convo)
             {
@@ -324,7 +343,7 @@ namespace Phantasma.AI
                 }
                 lines.Add(CHAT_BREAK);
 
-                var fileName = GetChatLogPath(userID);
+                var fileName = GetChatLogPath(chat_id);
 
                 File.AppendAllLines(fileName, lines);
             }
@@ -340,8 +359,10 @@ namespace Phantasma.AI
 
             lock (pending)
             {
-                pending.Remove(userID);
+                pending.Remove(chat_id);
             }
+
+            Console.WriteLine($"CHATGPT.endRequest({chat_id})");
 
             return completionResult.Successful;
         }
@@ -383,12 +404,12 @@ namespace Phantasma.AI
             }
         }
 
-        private string GetConvoAsJSON(string userID)
+        private string GetConvoAsJSON(int chat_id)
         {
             var json = new StringBuilder();
             json.Append('[');
 
-            var entries = FindConvo(userID);
+            var entries = FindConvo(chat_id);
             foreach (var entry in entries)
             {
                 json.AppendLine($"\"{entry.text}\"");
@@ -398,21 +419,21 @@ namespace Phantasma.AI
             return json.ToString();
         }
 
-        private string GetChatLogPath(string userID)
+        private string GetChatLogPath(int chatID)
         {
-            return chatLogPath + userID + ".txt";
+            return chatLogPath + chatID + ".txt";
         }
 
-        private bool ChatExists(string userID)
+        private bool ChatExists(int chat_id)
         {
-            var fileName = GetChatLogPath(userID);
+            var fileName = GetChatLogPath(chat_id);
             return File.Exists(fileName);
         }
 
 
         private static Random random = new Random();
 
-        private string GenerateUserID()
+        private int GenerateUserID()
         {
             lock (convos)
             {
@@ -421,15 +442,23 @@ namespace Phantasma.AI
                 do
                 {
                     randomID = 1000 + random.Next() % 8999;
-                    var user_id = "ghost_" + randomID;
 
-                    if (!ChatExists(user_id))
+                    if (!ChatExists(randomID))
                     {
-                        return user_id;
+                        return randomID;
                     }
 
                 } while (true);
             }
+        }
+
+        private int GetChatID(HTTPRequest request)
+        {
+            int chat_id;
+
+            int.TryParse(request.GetVariable("chat_id"), out chat_id);
+
+            return chat_id;
         }
 
         private Dictionary<string, object> GetContext(HTTPRequest request)
@@ -438,16 +467,20 @@ namespace Phantasma.AI
 
             var user_id = session.ID.Substring(0, 16);
 
-            Console.WriteLine(session.ID);
+            var chat_id = GetChatID(request);
 
             var context = new Dictionary<string, object>();
             context["user_name"] = "Anonymous";
             context["user_id"] = user_id;
-            context["chat"] = BeautifyConvo(FindConvo(user_id));
+            context["chat_id"] = chat_id;
+            context["chat"] = BeautifyConvo(FindConvo(chat_id));
+
+            request.session.SetString("user_id", user_id);
+            request.session.SetInt("chat_id", chat_id);
 
             lock (pending)
             {
-                context["pending"] = pending.Contains(user_id);
+                context["pending"] = pending.Contains(chat_id);
             }
 
             return context;

@@ -29,9 +29,11 @@ namespace ChatGPT
                 apiKey = File.ReadAllText(apiKeyFile).Trim();
             }
 
-            chatbot = new Chatbot(path, apiKey);    
+            chatbot = new Chatbot(path, apiKey);
 
-            var server = new HTTPServer(settings, ConsoleLogger.Write);
+            LoggerCallback logger = (leve, msg) => { }; // , ConsoleLogger.Write
+
+            var server = new HTTPServer(settings, logger);
 
             chatbot.Install(server);
 

@@ -22,11 +22,7 @@
 		</div>
 	{{/if}}
 	</div>
-	
-	{{#if isSpecky}}
-	<hr>
-	{{/if}}
-	
+		
 {{/each}}
 
 {{#if pending}}
@@ -38,13 +34,14 @@
 	</div>
 	
 <script>
-	setInterval (dotsAnimation, 600);
+	startChatInterval();
 </script>
 {{#else}}
 
 <script>
 	if (chatInterval) {
 		clearInterval(chatInterval);  // Stop the current interval
+		chatInterval = -1;
 	}
 </script>
 {{/if}}
