@@ -1,9 +1,8 @@
 ﻿using System.Text;
-
+using LunarLabs.Bots;
 using LunarLabs.WebServer.Core;
 using LunarLabs.WebServer.HTTP;
 using LunarLabs.WebServer.Templates;
-using Phantasma.AI;
 
 namespace ChatGPT
 {
@@ -12,7 +11,7 @@ namespace ChatGPT
     {
 
         private static ServerSettings settings;
-        private static Chatbot chatbot;
+        private static ChatGTPBot chatbot;
 
         static async Task Main(string[] args)
         {
@@ -29,7 +28,7 @@ namespace ChatGPT
                 apiKey = File.ReadAllText(apiKeyFile).Trim();
             }
 
-            chatbot = new Chatbot(path, apiKey);
+            chatbot = new ChatGTPBot(path, apiKey);
 
             LoggerCallback logger = (leve, msg) => { }; // , ConsoleLogger.Write
 

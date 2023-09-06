@@ -9,13 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LunarLabs.Parser" Version="1.5.4" />
-    <PackageReference Include="LunarLabs.Server" Version="1.5.10" />
+    <PackageReference Include="LunarLabs.Parser" Version="1.5.5" />
+    <PackageReference Include="LunarLabs.Server" Version="1.5.11" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LunarServer\LunarServer\LunarServer.csproj" />
-    <ProjectReference Include="..\ChatBotLib\ChatBotLib.csproj" />
+    <ProjectReference Include="..\..\LunarBot\LunarBot\Lunar.Bot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

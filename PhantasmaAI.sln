@@ -5,9 +5,7 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher", "Launcher\Launcher.csproj", "{586953B7-8976-4FD1-B604-4633A5BC6596}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatBotLib", "ChatBotLib\ChatBotLib.csproj", "{B128DFC4-4934-4E99-9832-DCA40717B260}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LunarServer", "..\LunarServer\LunarServer\LunarServer.csproj", "{09F5F305-6ADE-433A-98B9-F26583B34809}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunar.Bot", "..\LunarBot\LunarBot\Lunar.Bot.csproj", "{DD2AA79F-3149-42C4-A5D6-403F6D56196F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +17,10 @@ Global
 		{586953B7-8976-4FD1-B604-4633A5BC6596}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{586953B7-8976-4FD1-B604-4633A5BC6596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{586953B7-8976-4FD1-B604-4633A5BC6596}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B128DFC4-4934-4E99-9832-DCA40717B260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B128DFC4-4934-4E99-9832-DCA40717B260}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B128DFC4-4934-4E99-9832-DCA40717B260}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B128DFC4-4934-4E99-9832-DCA40717B260}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09F5F305-6ADE-433A-98B9-F26583B34809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09F5F305-6ADE-433A-98B9-F26583B34809}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09F5F305-6ADE-433A-98B9-F26583B34809}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09F5F305-6ADE-433A-98B9-F26583B34809}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD2AA79F-3149-42C4-A5D6-403F6D56196F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD2AA79F-3149-42C4-A5D6-403F6D56196F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD2AA79F-3149-42C4-A5D6-403F6D56196F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD2AA79F-3149-42C4-A5D6-403F6D56196F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
