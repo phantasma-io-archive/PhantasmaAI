@@ -63,8 +63,11 @@
     </div>
 {{#else}}
     <!-- Chat input box -->
-    <div class="input-group mt-3">
-        <textarea class="form-control box-shadow" id="user_request_text" rows="4" placeholder="Explain what you need..."
+    <div class="input-group mt-3 box-shadow">
+        <textarea class="form-control box-shadow" 
+                  id="user_request_text"
+                  style="border-top-left-radius: 12px; border-bottom-left-radius: 12px;"
+                  rows="4" placeholder="Explain what you need..."
                   aria-label="Chat message" {{#if pending}} disabled{{/if}}></textarea>
         <button class="btn btn-primary box-shadow" type="button" id="send-button" onclick="sendChat()"
                 {{#if pending}} disabled{{/if}}>Send</button>
