@@ -3,15 +3,15 @@
     <div class="row" style="margin-top:10px">
         {{#if isAssistant}}
         <!-- Message from Specky -->
-        <div class="chat-bubble specky-user d-flex justify-content-end">
-            <div class="chat-text">{{{text}}}</div>
+        <div class="chat-bubble specky-user d-flex justify-content-end ">
+            <div class="chat-text box-shadow">{{{text}}}</div>
             <img src="assets/specky.png" alt="User 2 Avatar">
         </div>
         {{#else}}
         <!-- Message from current user -->
         <div class="chat-bubble current-user d-flex justify-content-start">
             <img src="assets/avatar.jpg" alt="User 1 Avatar">
-            <div class="chat-text">{{{text}}}</div>
+            <div class="chat-text ">{{{text}}}</div>
         </div>
         {{/if}}
     </div>
@@ -21,7 +21,7 @@
 {{#if pending}}
     <!-- Pending Message from Specky -->
     <div class="chat-bubble specky-user d-flex justify-content-end">
-        <div class="chat-text">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></div>
+        <div class="chat-text box-shadow">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></div>
         <img src="assets/specky.png" alt="User 2 Avatar">
     </div>
     
@@ -49,7 +49,7 @@
 {{/if}}
 
 <div class="d-none" id="error_message"><br>
-    <div class="alert alert-danger" role="alert">An error occured!</div>
+    <div class="alert alert-danger box-shadow" role="alert">An error occured!</div>
 </div>
 
 {{#if options}}
@@ -64,9 +64,9 @@
 {{#else}}
     <!-- Chat input box -->
     <div class="input-group mt-3">
-        <textarea class="form-control" id="user_request_text" rows="4" placeholder="Explain what you need..."
+        <textarea class="form-control box-shadow" id="user_request_text" rows="4" placeholder="Explain what you need..."
                   aria-label="Chat message" {{#if pending}} disabled{{/if}}></textarea>
-        <button class="btn btn-primary" type="button" id="send-button" onclick="sendChat()"
+        <button class="btn btn-primary box-shadow" type="button" id="send-button" onclick="sendChat()"
                 {{#if pending}} disabled{{/if}}>Send</button>
     </div>
 {{/if}}
