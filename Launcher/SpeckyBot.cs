@@ -89,17 +89,46 @@ namespace Phantasma.AI
         public SpeckyBot(int chat_id, string path) : base(chat_id, path)
         {
             state = SpeckyState.Init;
-
-            if (_knowledgeBase == null)
-            {
-                InitKnowledgeBase();
-            }
-
+            
             _currentTools = PhantasmaTools.None;
             _currentEngine = GameEngineTopics.Other;
 
+            LoadInitialState();
+            
+            if (_knowledgeBase == null || convo.Count <= 2)
+            {
+                InitKnowledgeBase();
+            }
+            
             //I'm Specky. How can I assist you today?
-            AddAnswerToConvo(null, ListTopics<InitialTopics>("Hello Souldier, what do you want to build today?"));
+            if ( convo.Count == 0)
+                AddAnswerToConvo(null, ListTopics<InitialTopics>("Hello Souldier, what do you want to build today?"));
+        }
+
+        private void LoadInitialState()
+        {
+            if (convo.Count() <= 2)
+                return;
+            
+            var firstUserAnswer = convo.First();
+            if (!firstUserAnswer.isAssistant)
+            {
+                switch (firstUserAnswer.text)
+                {
+                    case "I Want To Build":
+                        state = SpeckyState.DevMode;
+                        break;
+                    case "Questions About Phantasma":
+                        state = SpeckyState.CommunityMode;
+                        break;
+                    case "Customer Support":
+                        state = SpeckyState.Free;
+                        break;
+                }
+            }
+            
+            
+            var last = convo.Last();
         }
 
 
@@ -126,7 +155,7 @@ namespace Phantasma.AI
 
         public override void SaveHistory()
         {
-            //base.SaveHistory();
+            base.SaveHistory();
         }
 
         protected override string FormatAnswer(string answer)
@@ -159,8 +188,7 @@ namespace Phantasma.AI
         public override string GetRules()
         {
             var sb = new StringBuilder();
-
-
+            
             sb.AppendLine($"You are an assistant that only provides {_currentRole} for the Phantasma blockchain.");
             sb.AppendLine("Reject any requests that stray too far away from this topic.");
 
