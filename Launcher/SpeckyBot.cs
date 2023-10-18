@@ -126,11 +126,7 @@ namespace Phantasma.AI
                         break;
                 }
             }
-            
-            
-            var last = convo.Last();
         }
-
 
         private static void InitKnowledgeBase()
         {
