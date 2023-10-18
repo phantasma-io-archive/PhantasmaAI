@@ -20,24 +20,31 @@ A powerful conversation chatbot powered by GTP technology to assist in creating 
 
 ## 🛠️ Setup & Installation
 
-1. **Clone the Repository**
+1. **Clone the LunarBot**
 
     ```bash
-    git clone https://github.com/phantasma-io/PhantasmaAI.git
+    git clone git@github.com:Relfos/LunarBot.git
     cd PhantasmaAI
     ```
 
-2. **Setup OpenAI API Key**
+2. **Clone the Repository**
 
-   Create a file named `apikey.txt` in the root directory of the project. Paste your OpenAI API key into this file and save it.
+    ```bash
+    git clone git@github.com:phantasma-io/PhantasmaAI.git
+    cd PhantasmaAI
+    ```
 
-3. **Install Dependencies**
+3. **Setup OpenAI API Key**
+
+   Create a file named `apikey.txt` in the `www/` directory of the project. Paste your OpenAI API key into this file and save it.
+
+4. **Install Dependencies**
 
     ```bash
     dotnet restore
     ```
 
-4. **Run PhantasmaAI**
+5. **Run PhantasmaAI**
 
     ```bash
     dotnet run
