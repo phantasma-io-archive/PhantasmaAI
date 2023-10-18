@@ -24,7 +24,6 @@ A powerful conversation chatbot powered by GTP technology to assist in creating 
 
     ```bash
     git clone git@github.com:Relfos/LunarBot.git
-    cd PhantasmaAI
     ```
 
 2. **Clone the Repository**

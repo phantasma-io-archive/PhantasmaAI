@@ -1,157 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Phantasma AI</title>
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
-        <link href="css/chatbot.css" rel="stylesheet" />
-		
-		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="Phantasma AI, AI Chatbot, Phantasma Chain"/>
+    <meta name="author" content=""/>
+    <title>Phantasma AI</title>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="css/styles.css" rel="stylesheet"/>
+    <link href="css/chatbot.css" rel="stylesheet"/>
 
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
-    </head>
-    <body>
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+</head>
+<body>
+
 <script>
-var endPoint = "/convo/{{chat_id}}";
+    var endPoint = "/convo/{{chat_id}}";
+    var endPointLast = "/convo/last/{{chat_id}}";
 
-console.log("Session id: {{user_id}}");
-console.log("Chat id: {{chat_id}}");
+    console.log("Session id: {{user_id}}");
+    console.log("Chat id: {{chat_id}}");
 
-var dots = 0;
-var tryCount = 0;
-var hasAnswer = false;    
-var chatInterval = -1;
+    var dots = 0;
+    var tryCount = 0;
+    var hasAnswer = false;
+    var chatInterval = -1;
+    var dotsInterval = -1;
 
-function startChatInterval() 
-{
-	if (chatInterval === -1) 
-	{
-		chatInterval = setInterval(getChat, 4000);
-	}
-}
-
-function getChat() {
-	console.log("Checking chat...");
-    $.ajax({
-        type: "GET",
-        url: endPoint,
-        success: function(response) {
-			let current = $('#chatContent').html();
-		
-			console.log("Updated chat...");
-			$('#chatContent').html(response);
-			//hljs.highlightAll();
-		
-			tryCount++;
-			if (tryCount >= 6) {
-				location.reload();
-			}				
-        },
-        error: function(error) {
-			$('#error_message').removeClass('d-none');
-
-            console.error("Error fetching chat: ", error);
-			clearInterval(chatInterval);  // Stop the current interval
+    function startChatInterval() {
+        if (chatInterval === -1) {
+            chatInterval = setInterval(getChat, 3000);
         }
-    });
-}
 
-function sendChat() {
-	tryCount = 0;
-	console.log("Sending chat...");
-	$('#sendBtn').attr('disabled', 'disabled'); // Disable the Send button
-
-	var userText = $('#user_request_text').val();  // Get the text from the textarea
-
-    if (!userText.trim()) {  // Check if the textarea is not empty
-        alert("Please enter some text before sending.");
-        return;
+        if (dotsInterval === -1) {
+            dotsInterval = setInterval(dotsAnimation, 100);
+        }
     }
 
-	$('#user_request_text').val('');  
-	$('#user_request_text').prop('disabled', true);
-	$('#error_message').addClass('d-none');
-		
-	$.ajax({
-		type: "POST",
-		url: endPoint,
-		data: {	
-			message: userText  // Send the text as data
-		},
-		success: function(response) {
-			console.log("Chat sent successfully");
-			$('#chatContent').html(response);
-		},
-		error: function(error) {
-			$('#error_message').removeClass('d-none');
-			$('#user_request_text').prop('disabled', false);
+    function writeEffect(text) {
+        var index = 0;
+        var textElement = $('#chatContent');
 
-			console.error("Error sending chat: ", error);
-			// Handle the error
-		}
-	});
-}
+        var typingInterval = setInterval(function () {
+            textElement.html($('#chatContent').html()+text[index]);
+            index++;
+            if (index === text.length) {
+                clearInterval(typingInterval);
+            }
+        }, 2);  // Speed of typing effect: 100ms between characters
+    }
 
-function dotsAnimation()
-{
-    if(dots < 3)
-    {
-        $('#dots').append('.');
-        dots++;
+    function getChat() {
+        console.log("Checking chat...");
+        $.ajax({
+            type: "GET",
+            url: endPoint,
+            success: function (response) {
+                let current = $('#chatContent').html();
+
+                console.log("Updated chat...");
+                //writeEffect(response);
+                $('#chatContent').html(response);
+                //hljs.highlightAll();
+
+                tryCount++;
+                console.log("Try count: " + tryCount);
+                if (tryCount >= 4) {
+                    //clearInterval(chatInterval);  // Stop the current interval
+                    location.reload();
+                }
+            },
+            error: function (error) {
+                $('#error_message').removeClass('d-none');
+
+                console.error("Error fetching chat: ", error);
+                clearInterval(chatInterval);  // Stop the current interval
+            }
+        });
     }
-    else
-    {
-        $('#dots').html('.');
-        dots = 1;
+
+    function sendChat() {
+        tryCount = 0;
+        console.log("Sending chat...");
+        $('#sendBtn').attr('disabled', 'disabled'); // Disable the Send button
+
+        var userText = $('#user_request_text').val();  // Get the text from the textarea
+
+        if (!userText.trim()) {  // Check if the textarea is not empty
+            alert("Please enter some text before sending.");
+            return;
+        }
+
+        $('#user_request_text').val('');
+        $('#user_request_text').prop('disabled', true);
+        $('#error_message').addClass('d-none');
+
+        $.ajax({
+            type: "POST",
+            url: endPoint,
+            data: {
+                message: userText  // Send the text as data
+            },
+            success: function (response) {
+                console.log("Chat sent successfully");
+                $('#chatContent').html(response);
+            },
+            error: function (error) {
+                $('#error_message').removeClass('d-none');
+                $('#user_request_text').prop('disabled', false);
+
+                console.error("Error sending chat: ", error);
+                // Handle the error
+            }
+        });
     }
-}
+
+    function dotsAnimation() {
+        if (dots < 3) {
+            $('#dots').append('.');
+            dots++;
+        } else {
+            $('#dots').html('.');
+            dots = 1;
+        }
+    }
 
 </script>
-	
-        <!-- Page content-->
-        <div class="container">
-            <div class="text-center mt-5">
-                <h1>Phantasma AI</h1>
-                <p class="lead">Create your own dapp without coding!</p>
+
+<!-- Page content-->
+<div class="container">
+    <div class="text-center mt-5">
+        <h1>Phantasma AI</h1>
+        <p class="lead">Create your own dapp without coding!</p>
+    </div>
+
+    <section style="xbackground-color: #eee;">
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-10">
+
+                    <div class="card  box-shadow" id="chat1" style="border-radius: 15px;">
+                        <div class="card-body">
+
+                            <div id="chatContent">{{#include convo}}</div>
+                            <div id="userInput" class="mt-4">
+                                <!-- INPUT FORM -->
+                                <div class="container row">
+                                    <div class="col-10 form-outline">
+                                        <label class="form-label" for="user_request_text">Ask something:</label>
+                                        <textarea class="form-control  box-shadow " id="user_request_text" rows="4"
+                                                  {{#if pending}} disabled{{/if}}></textarea>
+                                    </div>
+
+                                    <div class="col-2 text-center position-relative">
+                                        <button type="button"
+                                                class="btn btn-primary position-absolute start-0 bottom-0 end-0  box-shadow"
+                                                id="sendBtn" onclick="sendChat()"
+                                                {{#if pending}}
+                                                    disabled
+                                                {{/if}}
+                                        >SEND <i class="fas fa-caret-right"></i></button>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="d-none" id="error_message"><br>
+                                    <div class="alert alert-danger" role="alert">An error occured!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-			<section style="xbackground-color: #eee;">
-			  <div class="container py-5">
-
-				<div class="row d-flex justify-content-center">
-				  <div class="col-md-10">
-
-					<div class="card" id="chat1" style="border-radius: 15px;">
-					  <div class="card-body">
-
-						<div id="chatContent">{{#include convo}}</div>
-	
-					  </div>
-					</div>
-
-				  </div>
-				</div>
-
-			  </div>
-			</section>
-
-			
         </div>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-		
+    </section>
+</div>
+
+<div id="scrollButtons" class="d-flex flex-column">
+    <button id="scrollTopButton" class="btn btn-primary">
+        <i class="fas fa-angle-up"></i>
+    </button>
+    <button id="newChat" class="btn btn-outline-primary" >New Chat</button>
+    <button id="scrollBottomButton" class="btn btn-secondary">
+        <i class="fas fa-angle-down"></i>
+    </button>
+</div>
+
+
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
 <script>
-$(document).ready(function() {
-	//hljs.highlightAll();
-});
+    $(document).ready(function () {
+        //hljs.highlightAll();
+
+        // Scroll to top when the top button is clicked
+        $('#scrollTopButton').click(function () {
+            $('html, body').animate({scrollTop: 0}, 300);
+            return false;
+        });
+
+        // Scroll to bottom when the bottom button is clicked
+        $('#scrollBottomButton').click(function () {
+            $('html, body').animate({scrollTop: $(document).height() - $(window).height()}, 300);
+            return false;
+        });
+        
+        $("#newChat").click(function (){
+           location.href = "/";
+           
+        });
+    });
 
 </script>
-		
-    </body>
+
+</body>
 </html>

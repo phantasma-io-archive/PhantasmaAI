@@ -32,4 +32,11 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\www\**\**">
+      <Link>www\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

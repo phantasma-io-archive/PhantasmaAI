@@ -1,56 +1,64 @@
-
-
 {{#each chat}}
-	<div class="row" style="margin-top:10px">
-	{{#if isSpecky}}
-		<div class="col-10">
-		  <div class="p-3 me-3 border" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-			<p>{{{text}}}</p>
-		  </div>
-		</div>
-		<div class="col-2" style="min-width:48px">
-			  <img src="assets/specky.png"alt="avatar 1" style="width: 45px; height: 45px;">
-		</div>
-	{{#else}}
-		<div class="col-1" style="min-width:48px">
-			  <img src="assets/avatar.jpg"alt="avatar 1" style="width: 45px; height: 45px;">
-		</div>
-		<div class="col-10">
-		  <div style="border-radius: 15px; background-color: #fbfbfb;">
-			<p>{{{text}}}</p>
-		  </div>
-		</div>
-	{{/if}}
-	</div>
-		
+<div class="row mt-4">
+    {{#if isSpecky}}
+    <div class="col-11">
+        <div class="p-3 me-3 border chatbubble box-shadow">
+            <p>{{{text}}}</p>
+        </div>
+    </div>
+    <div class="col-1 d-flex align-items-center align-content-center" style="min-width:48px">
+        <img src="assets/specky.png" alt="avatar 1" class="me-3" style="width: 45px; height: 45px;">
+    </div>
+    {{#else}}
+    <div class="col-1 d-flex align-items-center align-content-center" style="min-width:48px">
+        <img src="assets/avatar.jpg" alt="avatar 1" class="ms-3" style="width: 45px; height: 45px;">
+    </div>
+    <div class="col-11">
+        <div class="p-3 border chatbubble chatbubble-user box-shadow">
+            <p>{{{text}}}</p>
+        </div>
+    </div>
+    {{/if}}
+</div>
 {{/each}}
 
 {{#if pending}}
-	<div id="loadingSpinner" class="d-flex flex-row justify-content-end mb-4">
-	  <div class="p-3 me-3 border" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
-		<p class="small mb-0">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></p>
-	  </div>
-		  <img src="assets/specky.png"alt="avatar 1" style="width: 45px; height: 100%;">
-	</div>
-	
+<div class="row mt-4">
+    <!--<div id="loadingSpinner" class="d-flex justify-content-end">
+        <div class="p-3 me-3 border chatbubble box-shadow">
+            <p class="small mb-0">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></p>
+        </div>
+    </div>
+    <div class="col-1 d-flex align-items-center align-content-center" style="min-width:48px">
+        <img src="assets/specky.png" alt="avatar 1" class="me-3" style="width: 45px; height: 45px;">
+    </div>-->
+    <div id="loadingSpinner" class="d-flex flex-row justify-content-end mt-4">
+        <div class="p-3 me-3 border chatbubble box-shadow ">
+            <p class="small mb-0">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></p>
+        </div>
+        <div class="col-1 d-flex align-items-center align-content-center" style="min-width:48px">
+            <img src="assets/specky.png" alt="avatar 1" class="me-3" style="width: 45px; height: 45px;">
+        </div>
+    </div>
+</div>
+
+
 <script>
-	startChatInterval();
+    startChatInterval();
 </script>
 {{#else}}
-
 <script>
-	if (chatInterval) {
-		clearInterval(chatInterval);  // Stop the current interval
-		chatInterval = -1;
-	}
+    if (chatInterval) {
+        clearInterval(chatInterval);  // Stop the current interval
+        chatInterval = -1;
+    }
+
+    if (dotsInterval) {
+        clearInterval(dotsInterval);  // Stop the current interval
+        dotsInterval = -1;
+    }
+
+    $('#user_request_text').prop('disabled', false);
+    $('#sendBtn').prop('disabled', false);
 </script>
 {{/if}}
-
-<!-- INPUT FORM -->
-<div class="form-outline">
-  <label class="form-label" for="user_request_text">Ask something:</label>
-  <textarea class="form-control" id="user_request_text" rows="4" {{#if pending}} disabled{{/if}}></textarea>
-</div>
-	
-<div class="d-none" id="error_message"><br><div class="alert alert-danger" role="alert">An error occured!</div></div>
-<button type="button" class="btn btn-primary" id="sendBtn" onclick="sendChat()" style="margin-top:16px"{{#if pending}} disabled{{/if}}>SEND</button>
