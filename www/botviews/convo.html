@@ -1,70 +1,74 @@
-
-{{#each chat}}
-	<div class="row" style="margin-top:10px">
-	{{#if isAssistant}}
-		<!-- Message from Specky -->
-		<div class="chat-bubble specky-user d-flex justify-content-end">
-			<div class="chat-text">{{{text}}}</div>
-			<img src="assets/specky.png" alt="User 2 Avatar">
-		</div>
-	{{#else}}
-		<!-- Message from current user -->
-		<div class="chat-bubble current-user d-flex justify-content-start">
-			<img src="assets/avatar.jpg" alt="User 1 Avatar">
-			<div class="chat-text">{{{text}}}</div>
-		</div>
-	{{/if}}
-	</div>
-		
-{{/each}}
+<div id="chats">
+    {{#each chat}}
+    <div class="row" style="margin-top:10px">
+        {{#if isAssistant}}
+        <!-- Message from Specky -->
+        <div class="chat-bubble specky-user d-flex justify-content-end ">
+            <div class="chat-text box-shadow">{{{text}}}</div>
+            <img src="assets/specky.png" alt="User 2 Avatar">
+        </div>
+        {{#else}}
+        <!-- Message from current user -->
+        <div class="chat-bubble current-user d-flex justify-content-start">
+            <img src="assets/avatar.jpg" alt="User 1 Avatar">
+            <div class="chat-text ">{{{text}}}</div>
+        </div>
+        {{/if}}
+    </div>
+    {{/each}}
+</div>
 
 {{#if pending}}
-	<!-- Pending Message from Specky -->
-	<div class="chat-bubble specky-user d-flex justify-content-end">
-		<div class="chat-text">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></div>
-		<img src="assets/specky.png" alt="User 2 Avatar">
-	</div>
-	
-<script>
-	startChatInterval();
-</script>
+    <!-- Pending Message from Specky -->
+    <div class="chat-bubble specky-user d-flex justify-content-end">
+        <div class="chat-text box-shadow">Hmm<span id="dots" style="min-width:20px; display:inline-block;"></span></div>
+        <img src="assets/specky.png" alt="User 2 Avatar">
+    </div>
+    
+    <script>
+        startChatInterval();
+    </script>
 {{#else}}
-
-<script>
-	if (chatInterval) {
-		clearInterval(chatInterval);  // Stop the current interval
-		chatInterval = -1;
-	}
-</script>
+    <script>
+        if (chatInterval) {
+            clearInterval(chatInterval);  // Stop the current interval
+            chatInterval = -1;
+        }
+    
+        if (dotsInterval) {
+            clearInterval(dotsInterval);  // Stop the current interval
+            dotsInterval = -1;
+        }
+    
+        $('#user_request_text').prop('disabled', false);
+        $('#sendBtn').prop('disabled', false);
+        
+        // Scroll to bottom when the bottom button is clicked
+        $('html, body').animate({scrollTop: $(document).height() }, 300);
+    </script>
 {{/if}}
 
-<div class="d-none" id="error_message"><br><div class="alert alert-danger" role="alert">An error occured!</div></div>
+<div class="d-none" id="error_message"><br>
+    <div class="alert alert-danger box-shadow" role="alert">An error occured!</div>
+</div>
 
 {{#if options}}
-<div class="help-text">Select an option:</div>
-<div class="mt-3">
-    <ul class="list-group" id="optionsList">
-		{{#each options}}
-        <li class="list-group-item list-group-item-action" id="{{id}}">{{caption}}</li>
-		{{/each}}
-    </ul>
-</div>
-{{#else}}		
-		<!-- Chat input box -->
-		<div class="input-group mt-3">				
-			<textarea class="form-control" id="user_request_text" rows="4" placeholder="Explain what you need..." aria-label="Chat message" {{#if pending}} disabled{{/if}}></textarea>
-			<button class="btn btn-primary" type="button" id="send-button" onclick="sendChat()" {{#if pending}} disabled{{/if}}>Send</button>
-		</div>
+    <div class="help-text">Select an option:</div>
+    <div class="mt-3">
+        <ul class="list-group" id="optionsList">
+            {{#each options}}
+            <li class="list-group-item list-group-item-action" id="{{id}}">{{caption}}</li>
+            {{/each}}
+        </ul>
+    </div>
+{{#else}}
+    <!-- Chat input box -->
+    <div class="input-group mt-3">
+        <textarea class="form-control box-shadow" id="user_request_text" rows="4" placeholder="Explain what you need..."
+                  aria-label="Chat message" {{#if pending}} disabled{{/if}}></textarea>
+        <button class="btn btn-primary box-shadow" type="button" id="send-button" onclick="sendChat()"
+                {{#if pending}} disabled{{/if}}>Send</button>
+    </div>
 {{/if}}
 
-{{#if has_controls}}
-	<div class="mt-3 d-flex justify-content-center">
-		<div class="pr-2" style="margin-right:12px">
-			<button class="btn btn-primary" id="newConvoBtn">New Chat</button>
-		</div>
-		<div>
-			<button class="btn btn-danger" id="deleteConvoBtn">Delete Chat</button>
-		</div>
-	</div>
-{{/if}}
 

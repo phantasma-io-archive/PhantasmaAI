@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Phantasma AI - Specky</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/chatbot.css" rel="stylesheet" />
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
@@ -21,12 +22,17 @@ var dots = 0;
 var tryCount = 0;
 var hasAnswer = false;    
 var chatInterval = -1;
+var dotsInterval = -1;
 
 function startChatInterval() 
 {
 	if (chatInterval === -1) 
 	{
 		chatInterval = setInterval(getChat, 4000);
+	}
+
+	if (dotsInterval === -1) {
+		dotsInterval = setInterval(dotsAnimation, 200);
 	}
 }
 
@@ -60,17 +66,8 @@ function sendChat(userText) {
 	tryCount = 0;
 	console.log("Sending chat...");
 	
-{{#if options}}
-	// Disable all options
-	/*
-	var allOptions = optionsList.querySelectorAll('.list-group-item');
-	allOptions.forEach(function(option) {
-		option.setAttribute('disabled', 'true');
-	});*/
-{{#else}}
 	$('#sendBtn').attr('disabled', 'disabled'); // Disable the Send button
-{{/if}}
-
+	
 	if (!userText) {
 		userText = $('#user_request_text').val();  // Get the text from the textarea
 	}
@@ -93,7 +90,6 @@ function sendChat(userText) {
 		success: function(response) {
 			console.log("Chat sent successfully");
 			$('#chatContent').html(response);
-			initHandlers();
 		},
 		error: function(error) {
 			$('#error_message').removeClass('d-none');
@@ -118,45 +114,36 @@ function dotsAnimation()
         dots = 1;
     }
 }
+$(window).ready(function () {
+	//hljs.highlightAll();
 
-function initHandlers()
-{
-{{#if options}}
-    var optionsList = document.getElementById("optionsList");
-    
-    optionsList.addEventListener("click", function(event) {
-        var clickedOption = event.target;
-        
-        if (clickedOption.classList.contains("list-group-item")) {
-            // Handle the clicked option
-            sendChat(clickedOption.id);
-        }
-    });
-{{/if}}
+	$("#newConvoBtn").click(function () {
+		window.location.href = 'new';
+	});
 	
-{{#if has_controls}}
-    var newConvoBtn = document.getElementById("newConvoBtn");
-    var deleteConvoBtn = document.getElementById("deleteConvoBtn");
+	$("#deleteConvoBtn").click(function (){
+		alert("Not implemented yet...");
+	});
+	
+	// Scroll to top when the top button is clicked
+	$('#scrollTopButton').click(function () {
+		$('html, body').animate({scrollTop: 0}, 300);
+		return false;
+	});
 
-    newConvoBtn.addEventListener("click", function() {
-        // Handle the "New Convo" button click
-        window.location.href = 'new';
-        // Your logic here (e.g., start a new conversation, refresh the chat interface, etc.)
-    });
+	// Scroll to bottom when the bottom button is clicked
+	$('#scrollBottomButton').click(function () {
+		$('html, body').animate({scrollTop: $(document).height() - $(window).height()}, 300);
+		return false;
+	});
 
-    deleteConvoBtn.addEventListener("click", function() {
-        // Handle the "Delete Convo" button click
-        alert("Not implemented yet...");
-		// Your logic here (e.g., delete the current conversation, ask for confirmation, etc.)
-    });	
-{{/if}}
-}
-
-document.addEventListener("DOMContentLoaded", function() 
-{
-	initHandlers();
+	$(document).on("click", ".list-group-item", function (e) {
+		console.log("Clicked: " + e.target.id);
+		sendChat(e.target.id);
+	});
+	
+	
 });
-
 </script>
 
 <div class="container">
@@ -169,8 +156,28 @@ document.addEventListener("DOMContentLoaded", function()
 	<div class="chat" id="chatContent">
 		{{#include convo}}	
 	</div>
-
+	
+	<div id="userControls" class="my-5">
+		<div class="mt-3 d-flex justify-content-center">
+			<div class="pr-2" style="margin-right:12px">
+				<button class="btn btn-primary" id="newConvoBtn">New Chat</button>
+			</div>
+			<div>
+				<button class="btn btn-danger" id="deleteConvoBtn">Delete Chat</button>
+			</div>
+		</div>
+	</div>
 </div>
+
+<div id="scrollButtons" class="d-flex flex-column">
+	<button id="scrollTopButton" class="btn btn-primary">
+		<i class="fas fa-angle-up"></i>
+	</button>
+	<button id="scrollBottomButton" class="btn btn-secondary">
+		<i class="fas fa-angle-down"></i>
+	</button>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

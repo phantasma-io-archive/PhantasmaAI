@@ -121,3 +121,39 @@ pre {
 .form-outline {
 	margin-top: 10px;
 }
+
+.box-shadow {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),
+	0 6px 20px rgba(0, 0, 0, 0.1); /* Horizontal offset, vertical offset, blur radius, spread radius, and color */
+	border-radius: 12px; /* Optional: for rounded corners */
+}
+
+
+#scrollTopButton, #scrollBottomButton {
+	display: block; /* Hidden by default */
+	border-radius: 5px;
+}
+
+#scrollButtons {
+	position: fixed;
+	bottom: 50vh;
+	right: 20px;
+	display: block; /* Hidden by default */
+}
+
+#scrollTopButton, #scrollBottomButton {
+	margin-top: 10px;
+	border-radius: 5px;
+}
+
+.box-shadow {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),
+	0 6px 20px rgba(0, 0, 0, 0.1); /* Horizontal offset, vertical offset, blur radius, spread radius, and color */
+	border-radius: 12px; /* Optional: for rounded corners */
+}
+
+#newChat{
+	margin-top: 10px;
+	border-radius: 5px;
+	right: 20px;
+}
