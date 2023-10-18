@@ -4,31 +4,39 @@ using LunarLabs.WebServer.Core;
 using LunarLabs.WebServer.HTTP;
 using LunarLabs.WebServer.Templates;
 
-namespace ChatGPT
+namespace Phantasma.AI
 {
-
     internal class Launcher
     {
 
         private static ServerSettings settings;
-        private static ChatGTPBot chatbot;
+        private static ChatGTPBotPlugin chatbot;
 
         static async Task Main(string[] args)
         {
-            settings = ServerSettings.Parse(args, prefix: "-");
+            settings = ServerSettings.Parse(args);
 
-            var path = settings.Path;
+            var path = settings.Path.Replace("\\", "/");
+
+            if (!path.EndsWith("/")) path += "/";
+
             Console.WriteLine("Server path: " + path);
 
-            var apiKeyFile = path + "apikey.txt";
+            var apiKeyFilePath = Path.GetFullPath(path + "apikey.txt");
             string apiKey = null;
 
-            if (File.Exists(apiKeyFile))
+            Console.WriteLine("Searching for " + apiKeyFilePath);
+
+            if (File.Exists(apiKeyFilePath))
             {
-                apiKey = File.ReadAllText(apiKeyFile).Trim();
+                apiKey = File.ReadAllText(apiKeyFilePath).Trim();
+            }
+            else
+            {
+                throw new Exception("API KEY file not found!");
             }
 
-            chatbot = new ChatGTPBot(path, apiKey);
+            chatbot = ChatGTPBotPlugin.Initialize<SpeckyBot>(path, apiKey);
 
             LoggerCallback logger = (leve, msg) => { }; // , ConsoleLogger.Write
 

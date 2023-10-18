@@ -1,22 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Phantasma AI</title>
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
-        <link href="css/chatbot.css" rel="stylesheet" />
-		
-		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Phantasma AI - Specky</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/chatbot.css" rel="stylesheet" />
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+</head>
+<body>
 
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-
-    </head>
-    <body>
 <script>
 var endPoint = "/convo/{{chat_id}}";
 
@@ -62,13 +56,25 @@ function getChat() {
     });
 }
 
-function sendChat() {
+function sendChat(userText) {
 	tryCount = 0;
 	console.log("Sending chat...");
+	
+{{#if options}}
+	// Disable all options
+	/*
+	var allOptions = optionsList.querySelectorAll('.list-group-item');
+	allOptions.forEach(function(option) {
+		option.setAttribute('disabled', 'true');
+	});*/
+{{#else}}
 	$('#sendBtn').attr('disabled', 'disabled'); // Disable the Send button
+{{/if}}
 
-	var userText = $('#user_request_text').val();  // Get the text from the textarea
-
+	if (!userText) {
+		userText = $('#user_request_text').val();  // Get the text from the textarea
+	}
+	
     if (!userText.trim()) {  // Check if the textarea is not empty
         alert("Please enter some text before sending.");
         return;
@@ -87,6 +93,7 @@ function sendChat() {
 		success: function(response) {
 			console.log("Chat sent successfully");
 			$('#chatContent').html(response);
+			initHandlers();
 		},
 		error: function(error) {
 			$('#error_message').removeClass('d-none');
@@ -112,46 +119,59 @@ function dotsAnimation()
     }
 }
 
-</script>
+function initHandlers()
+{
+{{#if options}}
+    var optionsList = document.getElementById("optionsList");
+    
+    optionsList.addEventListener("click", function(event) {
+        var clickedOption = event.target;
+        
+        if (clickedOption.classList.contains("list-group-item")) {
+            // Handle the clicked option
+            sendChat(clickedOption.id);
+        }
+    });
+{{/if}}
 	
-        <!-- Page content-->
-        <div class="container">
-            <div class="text-center mt-5">
-                <h1>Phantasma AI</h1>
-                <p class="lead">Create your own dapp without coding!</p>
-            </div>
+{{#if has_controls}}
+    var newConvoBtn = document.getElementById("newConvoBtn");
+    var deleteConvoBtn = document.getElementById("deleteConvoBtn");
 
-			<section style="xbackground-color: #eee;">
-			  <div class="container py-5">
+    newConvoBtn.addEventListener("click", function() {
+        // Handle the "New Convo" button click
+        window.location.href = 'new';
+        // Your logic here (e.g., start a new conversation, refresh the chat interface, etc.)
+    });
 
-				<div class="row d-flex justify-content-center">
-				  <div class="col-md-10">
+    deleteConvoBtn.addEventListener("click", function() {
+        // Handle the "Delete Convo" button click
+        alert("Not implemented yet...");
+		// Your logic here (e.g., delete the current conversation, ask for confirmation, etc.)
+    });	
+{{/if}}
+}
 
-					<div class="card" id="chat1" style="border-radius: 15px;">
-					  <div class="card-body">
-
-						<div id="chatContent">{{#include convo}}</div>
-	
-					  </div>
-					</div>
-
-				  </div>
-				</div>
-
-			  </div>
-			</section>
-
-			
-        </div>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-		
-<script>
-$(document).ready(function() {
-	//hljs.highlightAll();
+document.addEventListener("DOMContentLoaded", function() 
+{
+	initHandlers();
 });
 
 </script>
-		
-    </body>
+
+<div class="container">
+
+	<div style="display: flex; justify-content: center; align-items: baseline; margin-top: 20px;">
+		<h1>Phantasma AI</h1>
+		<h6 style="margin-left: 10px;">v2.0</h6>
+	</div>
+
+	<div class="chat" id="chatContent">
+		{{#include convo}}	
+	</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
