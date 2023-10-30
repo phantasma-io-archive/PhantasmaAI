@@ -10,3 +10,5 @@ obj/
 www/Chatlogs/
 
 www/apikey.txt
+.DS_Store
+.idea/
